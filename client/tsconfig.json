@@ -1,0 +1,6 @@
+{
+  "extends": "@tsconfig/react-native/tsconfig.json",
+  "compilerOptions": {
+    "lib": ["es2015.promise", "es2017"]
+  }
+}
