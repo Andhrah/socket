@@ -66,13 +66,14 @@ const ChatApp = () => {
     }
   };
 
-  const { container, textContainer, text, textInputContainer } = styles;
+  const { container, textContainer, text, textInputContainer, safeAreaContainer, inputStyle } = styles;
 
   return (
     <>
-      <SafeAreaView style={{ flex: 1 }}>
+      <SafeAreaView style={safeAreaContainer}>
         <View
         style={container}>
+          <Text style={{color: 'black', fontSize: 27, textAlign: 'center', marginTop: 20}}>Chats</Text>
           <FlatList
             data={chat}
             renderItem={({ item }) => {
@@ -95,12 +96,16 @@ const ChatApp = () => {
           <View style={textInputContainer}>
             <TextInput
               placeholder="Enter your name"
+              placeholderTextColor="#A9A9A9"
+              style={inputStyle}
               value={name}
               onChangeText={(username) => setName(username)}
             />
             <TextInput
               placeholder="Enter your message"
+              placeholderTextColor="#A9A9A9"
               value={message}
+              style={inputStyle}
               onChangeText={(textMessage) => setMessage(textMessage)}
             />
             <Button title="Send" onPress={handleSend} />
@@ -112,6 +117,11 @@ const ChatApp = () => {
 };
 
 const styles = StyleSheet.create({
+  safeAreaContainer: {
+    flex: 1,
+    backgroundColor: '#FFFFFF',
+    paddingBottom: 10,
+  },
   container: {
     flex: 1,
     justifyContent: 'center',
@@ -127,10 +137,21 @@ const styles = StyleSheet.create({
   },
   text: {
     fontSize: 20,
+    color: '#000000',
   },
   textInputContainer: {
     flexDirection: 'column',
     alignItems: 'center',
+  },
+  inputStyle: {
+    borderWidth: 1,
+    borderColor: '#B2BEB5',
+    marginBottom: 10,
+    width: '80%',
+    paddingHorizontal: 10,
+    color: '#000000',
+    borderRadius: 6,
+    paddingVertical: 15,
   },
 });
 
