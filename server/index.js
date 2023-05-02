@@ -1,40 +1,48 @@
 const io = require('socket.io')(3000);
-const userSockets = new Map();
+const activeConnections = [];
 
 io.on('connection', (socket) => {
   console.log('Client connected');
 
   socket.on('join', (username) => {
     console.log(`User ${username} joined`);
-    userSockets.set(username, socket);
+    activeConnections.push({ username, socket });
   });
 
   socket.on('message', (data) => {
-    console.log(`Received message: ${data}`);
+    try {
+      console.log(`Received message: ${data}`);
 
-    // Parse the data payload to extract the recipient and message
-    const { recipient, message } = JSON.parse(data);
+      // Parse the data payload to extract the recipient and message
+      const { recipient, message } = JSON.parse(data);
 
-    // Get the recipient's socket from the userSockets Map
-    const recipientSocket = userSockets.get(recipient);
+      // Get the recipient's socket from the activeConnections array
+      const recipientConnection = activeConnections.find(
+        (connection) => connection.username === recipient
+      );
 
-    if (recipientSocket) {
-      // If the recipient is online, send the message only to them
-      recipientSocket.emit('message', message);
-    } else {
-      // If the recipient is not online, ignore the message
-      console.log(`Recipient ${recipient} is not online`);
+      if (recipientConnection) {
+        // If the recipient is online, send the message only to them
+        recipientConnection.socket.emit('message', data);
+      } else {
+        // If the recipient is not online, ignore the message
+        console.log(`Recipient ${recipient} is not online`);
+      }
+    } catch (error) {
+      console.error(`Error parsing message: ${data}`, error);
     }
   });
 
   socket.on('disconnect', () => {
-    // Remove the socket from the userSockets Map when the user disconnects
-    for (const [username, userSocket] of userSockets.entries()) {
-      if (userSocket === socket) {
-        console.log(`User ${username} disconnected`);
-        userSockets.delete(username);
-        break;
-      }
+    // Remove the connection from the activeConnections array when the user disconnects
+    const index = activeConnections.findIndex(
+      (connection) => connection.socket === socket
+    );
+
+    if (index !== -1) {
+      const { username } = activeConnections[index];
+      console.log(`User ${username} disconnected`);
+      activeConnections.splice(index, 1);
     }
   });
 });
